@@ -12,6 +12,7 @@ import os
 MODEL_PATH = "hand_landmarker.task"
 
 # Pseudo-enum for landmarks
+# # Names for the hand-landmark numbers (fingertip and joint positions).
 class Lm:
     INDEX_FINGER_TIP = 8
     INDEX_FINGER_DIP = 7

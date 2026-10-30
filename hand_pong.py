@@ -29,6 +29,7 @@ def download_model():
         urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 # Hand Landmarks pseudo-enum
+# # Names for the hand-landmark numbers this game uses (fingertips/joints).
 class Lm:
     WRIST = 0
     INDEX_FINGER_MCP = 5
@@ -39,6 +40,7 @@ class Lm:
 # ─────────────────────────────────────────────
 # Systems
 # ─────────────────────────────────────────────
+# # One speck in a ball-bounce explosion.
 class Particle:
     __slots__ = ['x', 'y', 'vx', 'vy', 'life', 'max_life', 'color', 'size', 'friction']
 
@@ -63,6 +65,7 @@ class Particle:
     def is_alive(self):
         return self.life > 0
 
+# # Burst of particles where the ball hit a paddle.
 def spawn_explosion(particles, x, y, color, count=30, speed=10):
     for _ in range(count):
         angle = random.uniform(0, 2 * math.pi)
@@ -73,6 +76,8 @@ def spawn_explosion(particles, x, y, color, count=30, speed=10):
         size = random.randint(2, 6)
         particles.append(Particle(x, y, vx, vy, life, color, size))
 
+# # The ball: position + velocity; bounces off walls, speeds up on paddle
+# # hits, and explodes into particles on contact.
 class Ball:
     def __init__(self, w, h):
         self.w = w

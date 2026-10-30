@@ -21,6 +21,7 @@ GRAVITY = 0.6
 ORB_SPAWN_RATE = 0.03
 MAX_LIVES = 3
 
+# # One shard of a sliced orb.
 class Particle:
     def __init__(self, x, y, color):
         self.x = x
@@ -38,6 +39,7 @@ class Particle:
         self.life -= 0.03
         self.size *= 0.95
 
+# # One half of a sliced orb: keeps flying with its own velocity and spin.
 class OrbPiece:
     def __init__(self, x, y, vx, vy, color, radius):
         self.x = x
@@ -63,6 +65,7 @@ class OrbPiece:
             cv2.ellipse(img, (int(self.x), int(self.y)), (int(self.radius*0.8), int(self.radius*0.8)), 
                         int(self.angle), 0, 180, c, cv2.FILLED, cv2.LINE_AA)
 
+# # A floating glowing orb drifting across the screen, waiting to be sliced.
 class Orb:
     def __init__(self, w, h):
         self.x = random.randint(200, w - 200)
@@ -98,6 +101,8 @@ class Orb:
             cv2.circle(img, (int(self.x), int(self.y)), self.radius, self.color, -1)
             cv2.circle(img, (int(self.x - self.radius*0.3), int(self.y - self.radius*0.3)), int(self.radius*0.2), (255, 255, 255), -1)
 
+# # How far a point is from a line - used to test whether your finger-swipe
+# # cut through an orb.
 def point_to_line_dist(px, py, lx1, ly1, lx2, ly2):
     line_mag = math.hypot(lx2 - lx1, ly2 - ly1)
     if line_mag == 0:

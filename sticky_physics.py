@@ -14,6 +14,8 @@ MAX_BALLS = 30  # Performance cap
 # ─────────────────────────────────────────────
 # Physics Ball
 # ─────────────────────────────────────────────
+# # A simulated ball: gravity pulls it down, it bounces off screen edges and
+# # any real-world object the camera recognized.
 class Ball:
     def __init__(self, x, y, radius=12):
         self.x = x
@@ -58,6 +60,7 @@ class Ball:
 # ─────────────────────────────────────────────
 # Collision
 # ─────────────────────────────────────────────
+# # Geometry helper: the point on a wall segment nearest to the ball.
 def closest_point_on_segment(px, py, ax, ay, bx, by):
     dx, dy = bx - ax, by - ay
     length_sq = dx*dx + dy*dy
@@ -65,6 +68,7 @@ def closest_point_on_segment(px, py, ax, ay, bx, by):
     t = max(0, min(1, ((px-ax)*dx + (py-ay)*dy) / length_sq))
     return ax + t*dx, ay + t*dy
 
+# # Bounce a ball off one wall segment (push it out and reflect its velocity).
 def collide_ball_segment(ball, ax, ay, bx, by):
     cx, cy = closest_point_on_segment(ball.x, ball.y, ax, ay, bx, by)
     dist = math.hypot(ball.x - cx, ball.y - cy)
@@ -103,6 +107,8 @@ COLOR_RANGES = [
     {"lower": (175, 100, 100), "upper": (180, 255, 255), "name": "Red-hi"},
 ]
 
+# # Find brightly colored objects in the camera view and turn each into a
+# # rectangle the balls can bounce off.
 def detect_colored_rects(frame, min_area=1500, max_area=120000):
     """Detect bright-colored rectangular sticky notes using HSV color ranges.
     Much more stable than edge-based methods."""
@@ -166,6 +172,8 @@ def detect_colored_rects(frame, min_area=1500, max_area=120000):
 # ─────────────────────────────────────────────
 # Temporal Stabilizer (prevents flickering)
 # ─────────────────────────────────────────────
+# # Smooths the detected objects over a few frames so the 'walls' don't
+# # jitter when the detection flickers.
 class ObstacleStabilizer:
     """Requires consistent detection before showing an obstacle,
     and keeps it alive briefly after it disappears."""

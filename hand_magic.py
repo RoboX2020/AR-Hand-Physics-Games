@@ -28,6 +28,8 @@ def download_model():
         urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 # Hand Landmarks pseudo-enum
+# # MediaPipe numbers the 21 hand landmarks; these names make the code
+# # readable (INDEX_FINGER_TIP instead of '8').
 class Lm:
     WRIST = 0
     THUMB_TIP = 4
@@ -76,6 +78,7 @@ AURA_COLORS = [
 # ─────────────────────────────────────────────
 # Systems
 # ─────────────────────────────────────────────
+# # One glowing speck: position, velocity, and a lifetime that ticks down.
 class Particle:
     __slots__ = ['x', 'y', 'vx', 'vy', 'life', 'max_life', 'color', 'size', 'gravity']
 
@@ -101,6 +104,8 @@ class Particle:
         return self.life > 0
 
 
+# # Remembers where each fingertip has been so we can draw a fading
+# # comet-trail behind it.
 class TrailSystem:
     def __init__(self, max_length=MAX_TRAIL_LENGTH):
         self.trails = {}
@@ -124,6 +129,8 @@ class TrailSystem:
                 del self.trails[key]
 
 
+# # A virtual 3D cube you can grab and throw with your hand; it has
+# # position, velocity and spin, like a real tossed block.
 class InteractiveCube:
     def __init__(self, w, h):
         self.w = w
@@ -209,6 +216,7 @@ class InteractiveCube:
 # Effect Renderers
 # ─────────────────────────────────────────────
 
+# # Glowing orbs orbiting your palm.
 def draw_energy_orbs(overlay, palm_center, hand_idx, t):
     cx, cy = palm_center
     for i in range(ORB_COUNT):
@@ -226,6 +234,7 @@ def draw_energy_orbs(overlay, palm_center, hand_idx, t):
         cv2.circle(overlay, (ox, oy), size, (255, 255, 255), -1)
 
 
+# # Fading light-trails behind your fingertips.
 def draw_magic_trails(overlay, trail_system, hand_idx):
     fingertip_indices = [Lm.INDEX_FINGER_TIP, Lm.MIDDLE_FINGER_TIP, Lm.RING_FINGER_TIP, Lm.PINKY_TIP, Lm.THUMB_TIP]
     for fi, finger_idx in enumerate(fingertip_indices):
@@ -246,6 +255,7 @@ def draw_magic_trails(overlay, trail_system, hand_idx):
         cv2.circle(overlay, (int(last[0]), int(last[1])), 5, (255, 255, 255), -1)
 
 
+# # Jagged lightning bolts crackling between your fingers.
 def draw_lightning_arcs(overlay, landmarks, w, h, hand_idx, t):
     palm = landmarks[Lm.WRIST]
     palm_x, palm_y = int(palm.x * w), int(palm.y * h)
@@ -273,6 +283,7 @@ def draw_lightning_arcs(overlay, landmarks, w, h, hand_idx, t):
             cv2.line(overlay, points[j - 1], points[j], (255, 255, 255), 1, cv2.LINE_AA)
 
 
+# # Draw every live particle (and drop the burnt-out ones).
 def draw_particle_burst(overlay, particles):
     for p in particles:
         if not p.is_alive(): continue
@@ -283,6 +294,7 @@ def draw_particle_burst(overlay, particles):
         cv2.circle(overlay, (int(p.x), int(p.y)), size, color, -1)
 
 
+# # Create a burst of particles at one spot (used when a spell goes off).
 def spawn_particles(particles, cx, cy, count=20):
     for _ in range(count):
         angle = random.uniform(0, 2 * math.pi)
@@ -295,6 +307,7 @@ def spawn_particles(particles, cx, cy, count=20):
         particles.append(Particle(cx, cy, vx, vy, life, color, size, gravity=0.08))
 
 
+# # A crackling energy beam between your two palms when both hands are up.
 def draw_energy_beam(overlay, palm1, palm2, t):
     x1, y1 = palm1
     x2, y2 = palm2
@@ -335,6 +348,7 @@ def draw_energy_beam(overlay, palm1, palm2, t):
         cv2.circle(overlay, (nx, ny), pulse, (255, 255, 255), -1)
 
 
+# # A soft pulsing glow around the whole hand.
 def draw_aura_glow(overlay, landmarks, w, h, hand_idx, t):
     hand_points = [(int(lm.x * w), int(lm.y * h)) for lm in landmarks]
     if len(hand_points) < 5: return
@@ -360,6 +374,8 @@ def draw_aura_glow(overlay, landmarks, w, h, hand_idx, t):
         cv2.fillConvexPoly(overlay, np.array(expanded, dtype=np.int32), color, cv2.LINE_AA)
 
 
+# # Turns your index finger into a wand: swishes leave a trail, and a quick
+# # flick casts a 'spell' (a flying sparkle).
 def draw_wizard_wand(overlay, landmarks, w, h, hand_idx, past_tips, spells):
     wrist = landmarks[Lm.WRIST]
     index_mcp = landmarks[Lm.INDEX_FINGER_MCP]
@@ -417,6 +433,7 @@ def draw_wizard_wand(overlay, landmarks, w, h, hand_idx, past_tips, spells):
                 past_tips.clear()
 
 
+# # Fly each spell forward, burst it into particles when it fades.
 def update_and_draw_spells(overlay, particles, spells, w, h):
     for spell in spells[:]:
         spell['life'] -= 1
@@ -446,6 +463,8 @@ def update_and_draw_spells(overlay, particles, spells, w, h):
 # ─────────────────────────────────────────────
 # Hand state tracking for gesture detection
 # ─────────────────────────────────────────────
+# # Watches how open your hand is (fist vs open palm) by measuring fingertip
+# # distances from the wrist - opening your hand is the 'cast' gesture.
 class HandState:
     def __init__(self):
         self.prev_openness = 0.0
