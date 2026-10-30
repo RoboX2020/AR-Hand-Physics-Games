@@ -1,3 +1,8 @@
+# ============================================================================
+# magic_slicer.py - Fruit-Ninja-style game: glowing orbs drift across the
+# webcam view and you slice them with a swipe of your finger; sliced orbs
+# burst into particles. Pure fun demo of hand tracking + simple physics.
+# ============================================================================
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python

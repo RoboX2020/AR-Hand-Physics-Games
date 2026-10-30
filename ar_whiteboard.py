@@ -1,3 +1,7 @@
+# ============================================================================
+# ar_whiteboard.py - draw in mid-air: the webcam watches your hand (MediaPipe
+# hand tracking) and your fingertip becomes a pen on a virtual whiteboard.
+# ============================================================================
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python

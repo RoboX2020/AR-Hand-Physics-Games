@@ -1,3 +1,5 @@
+# PLAIN ENGLISH: classic Pong, but the paddles are your hands - move each
+# hand up and down in front of the webcam to keep the ball in play.
 """
 AR Hand Pong
 ============

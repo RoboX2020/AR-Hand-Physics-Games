@@ -1,3 +1,5 @@
+# PLAIN ENGLISH: wave your hands to conjure particle magic on the webcam
+# view (sparkles, trails, bursts that follow your fingers).
 """
 Hand Magic AR Effects
 =====================

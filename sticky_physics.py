@@ -1,3 +1,8 @@
+# ============================================================================
+# sticky_physics.py - balls bounce off real objects: hold up anything of a
+# bright color and the camera turns it into a solid paddle/wall that the
+# simulated balls collide with (color detection -> physics obstacles).
+# ============================================================================
 import cv2
 import numpy as np
 import math
